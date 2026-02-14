@@ -1,3 +1,7 @@
+from PIL import Image
+from reportlab.lib.utils import ImageReader
+from streamlit_drawable_canvas import st_canvas
+import io
 from io import BytesIO
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
@@ -42,8 +46,6 @@ REMOTE_16CH_PRICE = st.number_input(
 
 st.divider()
 
-st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
-st.title("Boutique Shutters Quote Calculator")
 
 # -----------------------------
 # Customer pricing (edit anytime)
@@ -143,6 +145,23 @@ else:
 st.divider()
 
 # Accessories inputs
+st.subheader("Rooms (Itemized for Quote)")
+
+rooms_df = st.data_editor(
+    [{"Room": "Living Room", "Sqft": 0.0, "AM25": 0, "AM28": 0}],
+    num_rows="dynamic",
+    use_container_width=True,
+    key="rooms_editor",
+)
+
+rooms = []
+for r in rooms_df:
+    name = str(r.get("Room", "")).strip() or "Room"
+    sqft = float(r.get("Sqft", 0) or 0)
+    am25 = int(r.get("AM25", 0) or 0)
+    am28 = int(r.get("AM28", 0) or 0)
+rooms.append({"name": name, "sqft": sqft, "am25": am25, "am28": am28})
+
 st.subheader("Accessories")
 chargers = st.number_input("Chargers", value=0, step=1)
 remote_1ch = st.number_input("Remotes (1ch)", value=0, step=1)
@@ -188,6 +207,8 @@ quote_date = colD.text_input("Date", datetime.now().strftime("%m/%d/%Y"))
 valid_days = colE.number_input("Valid for (days)", value=7, step=1)
 
 notes = st.text_area("Notes (optional)", "Thank you for choosing Boutique Shutters. Pricing subject to final measurements and product availability.")
+
+logo_file = st.file_uploader("Upload logo (PNG/JPG) (optional)", type=["png", "jpg", "jpeg"])
 
 def build_quote_pdf():
     buf = BytesIO()
@@ -279,6 +300,35 @@ def build_quote_pdf():
     c.save()
     buf.seek(0)
     return buf
+
+st.subheader("Deposit + Signature")
+
+deposit_pct = st.number_input("Deposit % due today", value=50, step=5) / 100.0
+deposit_due = customer_total * deposit_pct
+balance_due = customer_total - deposit_due
+
+st.write(f"**Deposit due today:** ${deposit_due:,.2f}")
+st.write(f"**Balance due at install:** ${balance_due:,.2f}")
+
+st.markdown("**Customer Signature (sign below):**")
+canvas = st_canvas(
+    fill_color="rgba(255, 255, 255, 0.0)",
+    stroke_width=3,
+    stroke_color="#000000",
+    background_color="#FFFFFF",
+    height=140,
+    width=520,
+    drawing_mode="freedraw",
+    key="signature_canvas",
+)
+
+signature_png_bytes = None
+if canvas.image_data is not None:
+    # Convert signature to PNG bytes
+    img = Image.fromarray((canvas.image_data).astype("uint8"))
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    signature_png_bytes = buf.getvalue()
 
 pdf_buf = build_quote_pdf()
 
