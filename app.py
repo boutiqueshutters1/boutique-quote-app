@@ -39,7 +39,11 @@ HUB_PRICE = st.number_input(
     "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode
 )
 
-st.divider()import streamlit as st
+st.divider()HUB_PRICE = st.number_input(
+    "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode
+)
+
+st.divider()
 
 st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
 st.title("Boutique Shutters Quote Calculator")
