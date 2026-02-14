@@ -1,3 +1,8 @@
+from io import BytesIO
+from datetime import datetime
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 import streamlit as st
 
 st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
@@ -169,6 +174,120 @@ margin = (profit / revenue_after_discount) if revenue_after_discount > 0 else 0.
 
 tax = revenue_after_discount * TAX_RATE
 customer_total = revenue_after_discount + tax
+
+st.divider()
+st.subheader("Customer Quote")
+
+colA, colB = st.columns(2)
+customer_name = colA.text_input("Customer name", "")
+customer_address = colB.text_input("Address (optional)", "")
+
+colC, colD, colE = st.columns(3)
+quote_id = colC.text_input("Quote #", f"BS-{datetime.now().strftime('%y%m%d-%H%M')}")
+quote_date = colD.text_input("Date", datetime.now().strftime("%m/%d/%Y"))
+valid_days = colE.number_input("Valid for (days)", value=7, step=1)
+
+notes = st.text_area("Notes (optional)", "Thank you for choosing Boutique Shutters. Pricing subject to final measurements and product availability.")
+
+def build_quote_pdf():
+    buf = BytesIO()
+    c = canvas.Canvas(buf, pagesize=letter)
+    w, h = letter
+
+    # Header
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, h - 60, "Boutique Shutters")
+    c.setFont("Helvetica", 10)
+    c.drawString(50, h - 78, "Phone: 404-966-7419   |   Website: boutiqueshutters.com")
+    c.line(50, h - 90, w - 50, h - 90)
+
+    # Quote meta
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(50, h - 120, "Quote")
+    c.setFont("Helvetica", 10)
+    c.drawString(50, h - 140, f"Quote #: {quote_id}")
+    c.drawString(220, h - 140, f"Date: {quote_date}")
+    c.drawString(360, h - 140, f"Valid: {int(valid_days)} days")
+
+    # Customer
+    y = h - 170
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(50, y, "Prepared for:")
+    c.setFont("Helvetica", 10)
+    c.drawString(140, y, customer_name or "(Name)")
+    if customer_address.strip():
+        c.drawString(140, y - 14, customer_address.strip())
+
+    # Line items (customer-facing)
+    y = h - 220
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(50, y, "Description")
+    c.drawString(420, y, "Amount")
+    c.line(50, y - 5, w - 50, y - 5)
+
+    y -= 22
+    def line(desc, amt):
+        nonlocal y
+        c.setFont("Helvetica", 10)
+        c.drawString(50, y, desc)
+        c.drawRightString(w - 50, y, f"${amt:,.2f}")
+        y -= 16
+
+    # These variables must already exist in your app calculations:
+    # total_sqft, am25_count, am28_count, chargers, remote_1ch, remote_16ch, hubs,
+    # SELL_PRICE_PER_SQFT, SELL_LABOR_PER_SQFT, MOTOR_CHARGE_AM25, MOTOR_CHARGE_AM28,
+    # CHARGER_PRICE, REMOTE_1CH_PRICE, REMOTE_16CH_PRICE, HUB_PRICE,
+    # trip_charge, discount_amt, revenue_after_discount, tax, customer_total
+
+    fabric_amt = float(total_sqft) * float(SELL_PRICE_PER_SQFT)
+    labor_amt  = float(total_sqft) * float(SELL_LABOR_PER_SQFT)
+    motor_amt  = int(am25_count) * float(MOTOR_CHARGE_AM25) + int(am28_count) * float(MOTOR_CHARGE_AM28)
+    acc_amt    = int(chargers) * float(CHARGER_PRICE) + int(remote_1ch) * float(REMOTE_1CH_PRICE) + int(remote_16ch) * float(REMOTE_16CH_PRICE) + int(hubs) * float(HUB_PRICE)
+
+    line(f"Window Treatments (Fabric) — {float(total_sqft):.2f} sqft", fabric_amt)
+    line(f"Installation — {float(total_sqft):.2f} sqft", labor_amt)
+
+    if int(am25_count) + int(am28_count) > 0:
+        line(f"Motors — AM25 x{int(am25_count)} / AM28 x{int(am28_count)}", motor_amt)
+
+    if int(chargers) + int(remote_1ch) + int(remote_16ch) + int(hubs) > 0:
+        line(f"Accessories — Chargers x{int(chargers)}, Remotes x{int(remote_1ch)+int(remote_16ch)}, Hubs x{int(hubs)}", acc_amt)
+
+    line("Trip/Service", float(trip_charge))
+    line("Discount", -float(discount_amt))
+
+    c.line(50, y - 6, w - 50, y - 6)
+    y -= 26
+    line("Subtotal", float(revenue_after_discount))
+    line("Sales Tax", float(tax))
+
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(50, y - 6, "TOTAL")
+    c.drawRightString(w - 50, y - 6, f"${float(customer_total):,.2f}")
+
+    # Notes
+    y -= 60
+    c.setFont("Helvetica-Bold", 10)
+    c.drawString(50, y, "Notes:")
+    c.setFont("Helvetica", 9)
+    text = c.beginText(50, y - 16)
+    for ln in (notes or "").splitlines():
+        text.textLine(ln)
+    c.drawText(text)
+
+    c.showPage()
+    c.save()
+    buf.seek(0)
+    return buf
+
+pdf_buf = build_quote_pdf()
+
+st.download_button(
+    label="⬇️ Download Professional Quote (PDF)",
+    data=pdf_buf,
+    file_name=f"{quote_id}.pdf",
+    mime="application/pdf"
+)
 
 st.subheader("Results")
 col1, col2, col3 = st.columns(3)
