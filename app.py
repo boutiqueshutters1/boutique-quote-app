@@ -5,7 +5,7 @@ import io
 from io import BytesIO
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+from reportlab.pdfgen import canvas as pdf_canvas
 
 import streamlit as st
 
@@ -212,7 +212,7 @@ logo_file = st.file_uploader("Upload logo (PNG/JPG) (optional)", type=["png", "j
 
 def build_quote_pdf():
     buf = BytesIO()
-    c = canvas.Canvas(buf, pagesize=letter)
+    c = pdf_canvas.Canvas(buf, pagesize=letter)
     w, h = letter
 
     # Header
@@ -311,7 +311,7 @@ st.write(f"**Deposit due today:** ${deposit_due:,.2f}")
 st.write(f"**Balance due at install:** ${balance_due:,.2f}")
 
 st.markdown("**Customer Signature (sign below):**")
-canvas = st_canvas(
+sig_canvas = st_canvas(
     fill_color="rgba(255, 255, 255, 0.0)",
     stroke_width=3,
     stroke_color="#000000",
@@ -323,13 +323,12 @@ canvas = st_canvas(
 )
 
 signature_png_bytes = None
-if canvas.image_data is not None:
+if sig_canvas.image_data is not None:
     # Convert signature to PNG bytes
-    img = Image.fromarray((canvas.image_data).astype("uint8"))
+    img = Image.fromarray(sig_canvas.image_data.astype("uint8"))
     buf = io.BytesIO()
     img.save(buf, format="PNG")
     signature_png_bytes = buf.getvalue()
-
 pdf_buf = build_quote_pdf()
 
 st.download_button(
