@@ -39,7 +39,7 @@ HUB_PRICE = st.number_input(
     "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode
 )
 
-st.divider()HUB_PRICE = st.number_input(
+HUB_PRICE = st.number_input(
     "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode
 )
 
