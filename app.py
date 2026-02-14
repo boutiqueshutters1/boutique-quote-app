@@ -2,13 +2,15 @@ import streamlit as st
 
 st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
 st.title("Boutique Shutters Quote Calculator")
+admin_mode = st.toggle("Admin mode (show pricing + costs)", value=False)
 
 # -----------------------------
 # Customer pricing (edit anytime)
 # -----------------------------
-SELL_PRICE_PER_SQFT = st.number_input("Sell price per sqft ($)", value=12.0, step=0.5)
-SELL_LABOR_PER_SQFT = st.number_input("Labor charge per sqft ($)", value=1.0, step=0.25)
-TRIP_CHARGE_TARGET = st.number_input("Trip charge target ($)", value=100.0, step=10.0)
+if admin_mode:
+    SELL_PRICE_PER_SQFT = st.number_input("Sell price per sqft ($)", value=12.0, step=0.5)
+    SELL_LABOR_PER_SQFT = st.number_input("Labor charge per sqft ($)", value=1.0, step=0.25)
+    TRIP_CHARGE_TARGET = st.number_input("Trip charge target ($)", value=100.0, step=10.0)
 
 MOTOR_CHARGE_AM25 = st.number_input("Customer price: AM25 ($)", value=100.0, step=10.0)
 MOTOR_CHARGE_AM28 = st.number_input("Customer price: AM28 ($)", value=150.0, step=10.0)
