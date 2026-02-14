@@ -44,6 +44,7 @@ REMOTE_16CH_PRICE = st.number_input(
     "Customer price: Remote 16ch ($)", value=45.0, step=1.0, disabled=not admin_mode, key="remote_16ch_price"
 )
 
+
 st.divider()
 
 
@@ -145,22 +146,6 @@ else:
 st.divider()
 
 # Accessories inputs
-st.subheader("Rooms (Itemized for Quote)")
-
-rooms_df = st.data_editor(
-    [{"Room": "Living Room", "Sqft": 0.0, "AM25": 0, "AM28": 0}],
-    num_rows="dynamic",
-    use_container_width=True,
-    key="rooms_editor",
-)
-
-rooms = []
-for r in rooms_df:
-    name = str(r.get("Room", "")).strip() or "Room"
-    sqft = float(r.get("Sqft", 0) or 0)
-    am25 = int(r.get("AM25", 0) or 0)
-    am28 = int(r.get("AM28", 0) or 0)
-rooms.append({"name": name, "sqft": sqft, "am25": am25, "am28": am28})
 
 st.subheader("Accessories")
 chargers = st.number_input("Chargers", value=0, step=1)
