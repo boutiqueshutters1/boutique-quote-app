@@ -9,40 +9,34 @@ admin_mode = st.toggle("Admin mode (show pricing + costs)", value=False)
 # Customer pricing
 # -----------------------------
 SELL_PRICE_PER_SQFT = st.number_input(
-    "Sell price per sqft ($)", value=12.0, step=0.5, disabled=not admin_mode
+    "Sell price per sqft ($)", value=12.0, step=0.5, disabled=not admin_mode, key="sell_price_sqft"
 )
 SELL_LABOR_PER_SQFT = st.number_input(
-    "Labor charge per sqft ($)", value=1.0, step=0.25, disabled=not admin_mode
+    "Labor charge per sqft ($)", value=1.0, step=0.25, disabled=not admin_mode, key="sell_labor_sqft"
 )
 TRIP_CHARGE_TARGET = st.number_input(
-    "Trip charge target ($)", value=100.0, step=10.0, disabled=not admin_mode
+    "Trip charge target ($)", value=100.0, step=10.0, disabled=not admin_mode, key="trip_charge_target"
 )
 
 MOTOR_CHARGE_AM25 = st.number_input(
-    "Customer price: AM25 ($)", value=100.0, step=10.0, disabled=not admin_mode
+    "Customer price: AM25 ($)", value=100.0, step=10.0, disabled=not admin_mode, key="motor_charge_am25"
 )
 MOTOR_CHARGE_AM28 = st.number_input(
-    "Customer price: AM28 ($)", value=150.0, step=10.0, disabled=not admin_mode
+    "Customer price: AM28 ($)", value=150.0, step=10.0, disabled=not admin_mode, key="motor_charge_am28"
 )
 
-# Accessories selling prices
 CHARGER_PRICE = st.number_input(
-    "Customer price: Charger ($)", value=22.0, step=1.0, disabled=not admin_mode
+    "Customer price: Charger ($)", value=22.0, step=1.0, disabled=not admin_mode, key="charger_price"
 )
 REMOTE_1CH_PRICE = st.number_input(
-    "Customer price: Remote 1ch ($)", value=29.0, step=1.0, disabled=not admin_mode
+    "Customer price: Remote 1ch ($)", value=29.0, step=1.0, disabled=not admin_mode, key="remote_1ch_price"
 )
 REMOTE_16CH_PRICE = st.number_input(
-    "Customer price: Remote 16ch ($)", value=45.0, step=1.0, disabled=not admin_mode
+    "Customer price: Remote 16ch ($)", value=45.0, step=1.0, disabled=not admin_mode, key="remote_16ch_price"
 )
 HUB_PRICE = st.number_input(
-    "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode
+    "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode, key="hub_price"
 )
-
-HUB_PRICE = st.number_input(
-    "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode
-)
-
 st.divider()
 
 st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
