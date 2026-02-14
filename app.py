@@ -2,6 +2,47 @@ import streamlit as st
 
 st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
 st.title("Boutique Shutters Quote Calculator")
+
+admin_mode = st.toggle("Admin mode (show pricing + costs)", value=False)
+
+# -----------------------------
+# Customer pricing
+# -----------------------------
+SELL_PRICE_PER_SQFT = st.number_input(
+    "Sell price per sqft ($)", value=12.0, step=0.5, disabled=not admin_mode
+)
+SELL_LABOR_PER_SQFT = st.number_input(
+    "Labor charge per sqft ($)", value=1.0, step=0.25, disabled=not admin_mode
+)
+TRIP_CHARGE_TARGET = st.number_input(
+    "Trip charge target ($)", value=100.0, step=10.0, disabled=not admin_mode
+)
+
+MOTOR_CHARGE_AM25 = st.number_input(
+    "Customer price: AM25 ($)", value=100.0, step=10.0, disabled=not admin_mode
+)
+MOTOR_CHARGE_AM28 = st.number_input(
+    "Customer price: AM28 ($)", value=150.0, step=10.0, disabled=not admin_mode
+)
+
+# Accessories selling prices
+CHARGER_PRICE = st.number_input(
+    "Customer price: Charger ($)", value=22.0, step=1.0, disabled=not admin_mode
+)
+REMOTE_1CH_PRICE = st.number_input(
+    "Customer price: Remote 1ch ($)", value=29.0, step=1.0, disabled=not admin_mode
+)
+REMOTE_16CH_PRICE = st.number_input(
+    "Customer price: Remote 16ch ($)", value=45.0, step=1.0, disabled=not admin_mode
+)
+HUB_PRICE = st.number_input(
+    "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode
+)
+
+st.divider()import streamlit as st
+
+st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
+st.title("Boutique Shutters Quote Calculator")
 admin_mode = st.toggle("Admin mode (show pricing + costs)", value=False)
 
 # -----------------------------
