@@ -34,14 +34,11 @@ REMOTE_1CH_PRICE = st.number_input(
 REMOTE_16CH_PRICE = st.number_input(
     "Customer price: Remote 16ch ($)", value=45.0, step=1.0, disabled=not admin_mode, key="remote_16ch_price"
 )
-HUB_PRICE = st.number_input(
-    "Customer price: Hub ($)", value=99.0, step=5.0, disabled=not admin_mode, key="hub_price"
-)
+
 st.divider()
 
 st.set_page_config(page_title="Boutique Shutters Quote", layout="centered")
 st.title("Boutique Shutters Quote Calculator")
-admin_mode = st.toggle("Admin mode (show pricing + costs)", value=False)
 
 # -----------------------------
 # Customer pricing (edit anytime)
